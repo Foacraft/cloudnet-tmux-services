@@ -61,6 +61,8 @@ public class TmuxService extends JVMService {
     @Override
     public void runCommand(@NonNull String command) {
         try {
+            // exit the copy mode anyway.
+            new ProcessBuilder("tmux", "send-keys", "-t", sessionId, "Escape").start().waitFor();
             new ProcessBuilder("tmux", "send-keys", "-t", sessionId, command, "C-m").start().waitFor();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -105,6 +107,8 @@ public class TmuxService extends JVMService {
             return;
         }
         try {
+            // exit the copy mode anyway.
+            new ProcessBuilder("tmux", "send-keys", "-t", sessionId, "Escape").start().waitFor();
             new ProcessBuilder("tmux", "send-keys", "-t", sessionId, "C-c").start().waitFor();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
