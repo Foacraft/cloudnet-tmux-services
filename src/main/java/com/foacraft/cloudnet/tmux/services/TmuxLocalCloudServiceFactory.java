@@ -1,5 +1,6 @@
 package com.foacraft.cloudnet.tmux.services;
 
+import com.foacraft.cloudnet.tmux.services.config.TmuxConfiguration;
 import eu.cloudnetservice.driver.event.EventManager;
 import eu.cloudnetservice.driver.service.ServiceConfiguration;
 import eu.cloudnetservice.node.TickLoop;
@@ -11,6 +12,7 @@ import eu.cloudnetservice.node.version.ServiceVersionProvider;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * cloudnet-tmux-services
@@ -25,6 +27,7 @@ public class TmuxLocalCloudServiceFactory extends BaseLocalCloudServiceFactory {
     protected final TickLoop mainThread;
     protected final EventManager eventManager;
     protected final CloudServiceManager cloudServiceManager;
+    protected final TmuxConfiguration tmuxConfiguration;
 
     @Inject
     public TmuxLocalCloudServiceFactory(
@@ -32,12 +35,14 @@ public class TmuxLocalCloudServiceFactory extends BaseLocalCloudServiceFactory {
         @NonNull Configuration nodeConfig,
         @NonNull CloudServiceManager cloudServiceManager,
         @NonNull EventManager eventManager,
-        @NonNull ServiceVersionProvider versionProvider
+        @NonNull ServiceVersionProvider versionProvider,
+        @NonNull TmuxConfiguration tmuxConfiguration
     ) {
         super(nodeConfig, versionProvider);
         this.mainThread = tickLoop;
         this.eventManager = eventManager;
         this.cloudServiceManager = cloudServiceManager;
+        this.tmuxConfiguration = tmuxConfiguration;
     }
 
     @Override
@@ -54,12 +59,13 @@ public class TmuxLocalCloudServiceFactory extends BaseLocalCloudServiceFactory {
             manager,
             this.eventManager,
             this.versionProvider,
-            preparer
+            preparer,
+            tmuxConfiguration
         );
     }
 
     @Override
     public @NonNull String name() {
-        return "tmux-jvm";
+        return tmuxConfiguration.factoryName();
     }
 }

@@ -1,5 +1,6 @@
 package com.foacraft.cloudnet.tmux.services;
 
+import com.foacraft.cloudnet.tmux.services.config.TmuxConfiguration;
 import eu.cloudnetservice.common.concurrent.Task;
 import eu.cloudnetservice.common.util.StringUtil;
 import eu.cloudnetservice.driver.event.EventManager;
@@ -28,6 +29,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TmuxService extends JVMService {
 
+    protected final TmuxConfiguration tmuxConfiguration;
     protected volatile String sessionId;
 
     public TmuxService(
@@ -37,9 +39,11 @@ public class TmuxService extends JVMService {
         @NonNull CloudServiceManager manager,
         @NonNull EventManager eventManager,
         @NonNull ServiceVersionProvider versionProvider,
-        @NonNull ServiceConfigurationPreparer serviceConfigurationPreparer
+        @NonNull ServiceConfigurationPreparer serviceConfigurationPreparer,
+        @NonNull TmuxConfiguration tmuxConfiguration
     ) {
         super(tickLoop, nodeConfig, configuration, manager, eventManager, versionProvider, serviceConfigurationPreparer);
+        this.tmuxConfiguration = tmuxConfiguration;
     }
 
     @Override
@@ -61,8 +65,6 @@ public class TmuxService extends JVMService {
     @Override
     public void runCommand(@NonNull String command) {
         try {
-            // exit the copy mode anyway.
-            new ProcessBuilder("tmux", "send-keys", "-t", sessionId, "Escape").start().waitFor();
             new ProcessBuilder("tmux", "send-keys", "-t", sessionId, command, "C-m").start().waitFor();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -116,16 +118,28 @@ public class TmuxService extends JVMService {
         Task.runAsync(() -> {
             if (this.alive()) {
                 try {
+                    new ProcessBuilder("tmux", "send-keys", "-t", sessionId, "Escape").start().waitFor();
+                    new ProcessBuilder("tmux", "send-keys", "-t", sessionId, "C-c").start().waitFor();
+                    Thread.sleep(3 * 1000);
+                    new ProcessBuilder("tmux", "send-keys", "-t", sessionId, "Escape").start().waitFor();
+                    new ProcessBuilder("tmux", "send-keys", "-t", sessionId, "C-c").start().waitFor();
+                    Thread.sleep(1 * 1000);
                     new ProcessBuilder("tmux", "kill-session", "-t", sessionId).start().waitFor();
-                } catch (InterruptedException | IOException e) {
-                    e.printStackTrace();
+                } catch (Throwable t) {
+                    t.printStackTrace();
                 }
+                LOGGER.severe(
+                    tmuxConfiguration.messages().get("service-stop-timeout")
+                        .replace("%service_uniqueid%", serviceId().uniqueId().toString())
+                        .replace("%service_task%", serviceId().taskName())
+                        .replace("%service_name%", sessionId)
+                );
             }
         }, Task.delayedExecutor(10, TimeUnit.SECONDS));
     }
 
     @Override
     public @NonNull String runtime() {
-        return "tmux-jvm";
+        return tmuxConfiguration.factoryName();
     }
 }

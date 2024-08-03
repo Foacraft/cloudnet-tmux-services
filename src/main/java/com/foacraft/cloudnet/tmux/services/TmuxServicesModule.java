@@ -1,6 +1,8 @@
 package com.foacraft.cloudnet.tmux.services;
 
+import com.foacraft.cloudnet.tmux.services.config.TmuxConfiguration;
 import dev.derklaro.aerogel.Element;
+import eu.cloudnetservice.driver.document.DocumentFactory;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.driver.module.ModuleLifeCycle;
 import eu.cloudnetservice.driver.module.ModuleTask;
@@ -20,6 +22,21 @@ import lombok.NonNull;
 @Singleton
 public class TmuxServicesModule extends DriverModule {
 
+    private TmuxConfiguration configuration;
+
+    @ModuleTask
+    public void loadConfiguration() {
+        this.configuration = this.readConfig(
+            TmuxConfiguration.class,
+            () -> new TmuxConfiguration(
+                "tmux-jvm",
+                20,
+                TmuxConfiguration.DEFAULT_MESSAGES
+            ),
+            DocumentFactory.json()
+        );
+    }
+
     @ModuleTask(order = 22)
     public void registerServiceFactory(
         @NonNull CloudServiceManager serviceManager,
@@ -27,11 +44,11 @@ public class TmuxServicesModule extends DriverModule {
     ) {
         // construct the factory instance & register it in the service manager
         var factory = moduleInjectionLayer.instance(TmuxLocalCloudServiceFactory.class);
-        serviceManager.addCloudServiceFactory("tmux-jvm", factory);
+        serviceManager.addCloudServiceFactory(this.configuration.factoryName(), factory);
     }
 
     @ModuleTask(lifecycle = ModuleLifeCycle.STOPPED)
     public void unregisterServiceFactory(@NonNull CloudServiceManager cloudServiceManager) {
-        cloudServiceManager.removeCloudServiceFactory("tmux-jvm");
+        cloudServiceManager.removeCloudServiceFactory(this.configuration.factoryName());
     }
 }
