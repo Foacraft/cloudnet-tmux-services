@@ -135,7 +135,7 @@ public class TmuxService extends JVMService {
                         .replace("%service_name%", sessionId)
                 );
             }
-        }, Task.delayedExecutor(10, TimeUnit.SECONDS));
+        }, Task.delayedExecutor(tmuxConfiguration.stopTimeout(), TimeUnit.SECONDS));
     }
 
     @Override

@@ -43,7 +43,9 @@ public class TmuxServicesModule extends DriverModule {
         @NonNull @Named("module") InjectionLayer<?> moduleInjectionLayer
     ) {
         // construct the factory instance & register it in the service manager
-        var factory = moduleInjectionLayer.instance(TmuxLocalCloudServiceFactory.class);
+        var factory = moduleInjectionLayer.instance(TmuxLocalCloudServiceFactory.class, builder -> {
+            builder.override(Element.forType(TmuxConfiguration.class), this.configuration);
+        });
         serviceManager.addCloudServiceFactory(this.configuration.factoryName(), factory);
     }
 

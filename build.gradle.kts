@@ -7,7 +7,6 @@ plugins {
 
 }
 
-
 repositories {
     mavenCentral()
     maven("https://repo.cloudnetservice.eu/repository/snapshots/")

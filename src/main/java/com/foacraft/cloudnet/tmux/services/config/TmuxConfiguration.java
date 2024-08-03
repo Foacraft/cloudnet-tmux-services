@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public record TmuxConfiguration(
     @NonNull String factoryName,
-    @NonNull int stopTimeout,
+    int stopTimeout,
     @NonNull Map<String, String> messages
 ) {
 
