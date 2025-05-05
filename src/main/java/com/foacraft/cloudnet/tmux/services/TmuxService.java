@@ -1,7 +1,7 @@
 package com.foacraft.cloudnet.tmux.services;
 
 import com.foacraft.cloudnet.tmux.services.config.TmuxConfiguration;
-import eu.cloudnetservice.common.concurrent.Task;
+import eu.cloudnetservice.common.concurrent.TaskUtil;
 import eu.cloudnetservice.common.util.StringUtil;
 import eu.cloudnetservice.driver.event.EventManager;
 import eu.cloudnetservice.driver.service.ServiceConfiguration;
@@ -96,7 +96,7 @@ public class TmuxService extends JVMService {
             this.process = builder.start();
             this.eventManager.callEvent(new CloudServicePostProcessStartEvent(this));
         } catch (IOException exception) {
-            LOGGER.severe("Unable to start process in %s with command line %s",
+            LOGGER.error("Unable to start process in %s with command line %s",
                 exception,
                 this.serviceDirectory,
                 String.join(" ", arguments));
@@ -115,7 +115,8 @@ public class TmuxService extends JVMService {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-        Task.runAsync(() -> {
+        TaskUtil.runAsync(() -> {
+            Thread.sleep(tmuxConfiguration.stopTimeout() * 1000L);
             if (this.alive()) {
                 try {
                     new ProcessBuilder("tmux", "send-keys", "-t", sessionId, "Escape").start().waitFor();
@@ -128,14 +129,14 @@ public class TmuxService extends JVMService {
                 } catch (Throwable t) {
                     t.printStackTrace();
                 }
-                LOGGER.severe(
-                    tmuxConfiguration.messages().get("service-stop-timeout")
-                        .replace("%service_uniqueid%", serviceId().uniqueId().toString())
-                        .replace("%service_task%", serviceId().taskName())
-                        .replace("%service_name%", sessionId)
+                LOGGER.error(
+                        tmuxConfiguration.messages().get("service-stop-timeout")
+                                .replace("%service_uniqueid%", serviceId().uniqueId().toString())
+                                .replace("%service_task%", serviceId().taskName())
+                                .replace("%service_name%", sessionId)
                 );
             }
-        }, Task.delayedExecutor(tmuxConfiguration.stopTimeout(), TimeUnit.SECONDS));
+        });
     }
 
     @Override

@@ -24,12 +24,12 @@ dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
     compileOnly("net.md-5:bungeecord-api:1.20-R0.2-SNAPSHOT")
 
-    compileOnly("eu.cloudnetservice.cloudnet:node:4.0.0-RC9")
-    compileOnly("eu.cloudnetservice.cloudnet:bridge:4.0.0-RC9")
-    compileOnly("eu.cloudnetservice.cloudnet:platform-inject-api:4.0.0-RC9")
+    compileOnly("eu.cloudnetservice.cloudnet:node:4.0.0-RC11")
+    compileOnly("eu.cloudnetservice.cloudnet:bridge:4.0.0-RC11")
+    compileOnly("eu.cloudnetservice.cloudnet:platform-inject-api:4.0.0-RC11")
 
     annotationProcessor("org.projectlombok:lombok:1.18.30")
-    annotationProcessor("eu.cloudnetservice.cloudnet:platform-inject-processor:4.0.0-RC9")
+    annotationProcessor("eu.cloudnetservice.cloudnet:platform-inject-processor:4.0.0-RC11")
 
     compileOnly(fileTree("libs"))
 }
