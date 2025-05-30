@@ -1,7 +1,6 @@
 package com.foacraft.cloudnet.tmux.services;
 
 import com.foacraft.cloudnet.tmux.services.config.TmuxConfiguration;
-import dev.derklaro.aerogel.Element;
 import eu.cloudnetservice.driver.document.DocumentFactory;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.driver.module.ModuleLifeCycle;
@@ -43,9 +42,8 @@ public class TmuxServicesModule extends DriverModule {
         @NonNull @Named("module") InjectionLayer<?> moduleInjectionLayer
     ) {
         // construct the factory instance & register it in the service manager
-        var factory = moduleInjectionLayer.instance(TmuxLocalCloudServiceFactory.class, builder -> {
-            builder.override(Element.forType(TmuxConfiguration.class), this.configuration);
-        });
+        var factory = moduleInjectionLayer.instance(TmuxLocalCloudServiceFactory.class,
+                builder -> builder.override(TmuxConfiguration.class, this.configuration));
         serviceManager.addCloudServiceFactory(this.configuration.factoryName(), factory);
     }
 

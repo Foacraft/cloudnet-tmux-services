@@ -1,10 +1,7 @@
 plugins {
     java
-    id("eu.cloudnetservice.juppiter") version "0.4.0"
+    id("eu.cloudnetservice.juppiter") version "0.5.0-beta.1"
     id("net.kyori.blossom") version "1.3.1"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("io.freefair.lombok") version "8.4"
-
 }
 
 repositories {
@@ -24,22 +21,20 @@ dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
     compileOnly("net.md-5:bungeecord-api:1.20-R0.2-SNAPSHOT")
 
-    compileOnly("eu.cloudnetservice.cloudnet:node:4.0.0-RC11")
-    compileOnly("eu.cloudnetservice.cloudnet:bridge:4.0.0-RC11")
-    compileOnly("eu.cloudnetservice.cloudnet:platform-inject-api:4.0.0-RC11")
+    compileOnly("eu.cloudnetservice.cloudnet:node-impl:4.0.0-RC12")
+    compileOnly("eu.cloudnetservice.cloudnet:bridge:4.0.0-RC12")
+    compileOnly("eu.cloudnetservice.cloudnet:platform-inject-api:4.0.0-RC12")
 
-    annotationProcessor("org.projectlombok:lombok:1.18.30")
-    annotationProcessor("eu.cloudnetservice.cloudnet:platform-inject-processor:4.0.0-RC11")
+    compileOnly("org.projectlombok:lombok:1.18.38")
+    annotationProcessor("org.projectlombok:lombok:1.18.38")
+    annotationProcessor("eu.cloudnetservice.cloudnet:platform-inject-processor:4.0.0-RC12")
 
     compileOnly(fileTree("libs"))
 }
 
 tasks {
-    shadowJar {
-        archiveClassifier.set("")
-    }
-    build {
-        dependsOn(shadowJar)
+    withType<JavaCompile> {
+        options.compilerArgs.add("--enable-preview")
     }
 }
 

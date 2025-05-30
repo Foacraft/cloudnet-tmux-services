@@ -1,17 +1,21 @@
 package com.foacraft.cloudnet.tmux.services;
 
 import com.foacraft.cloudnet.tmux.services.config.TmuxConfiguration;
-import eu.cloudnetservice.common.concurrent.TaskUtil;
-import eu.cloudnetservice.common.util.StringUtil;
 import eu.cloudnetservice.driver.event.EventManager;
+import eu.cloudnetservice.driver.language.I18n;
 import eu.cloudnetservice.driver.service.ServiceConfiguration;
-import eu.cloudnetservice.node.TickLoop;
 import eu.cloudnetservice.node.config.Configuration;
 import eu.cloudnetservice.node.event.service.CloudServicePostProcessStartEvent;
+import eu.cloudnetservice.node.impl.service.InternalCloudServiceManager;
+import eu.cloudnetservice.node.impl.service.defaults.JVMService;
+import eu.cloudnetservice.node.impl.service.defaults.log.ProcessServiceLogReadScheduler;
+import eu.cloudnetservice.node.impl.tick.DefaultTickLoop;
+import eu.cloudnetservice.node.impl.version.ServiceVersionProvider;
 import eu.cloudnetservice.node.service.CloudServiceManager;
 import eu.cloudnetservice.node.service.ServiceConfigurationPreparer;
-import eu.cloudnetservice.node.service.defaults.JVMService;
-import eu.cloudnetservice.node.version.ServiceVersionProvider;
+import eu.cloudnetservice.node.tick.TickLoop;
+import eu.cloudnetservice.utils.base.StringUtil;
+import eu.cloudnetservice.utils.base.concurrent.TaskUtil;
 import lombok.NonNull;
 
 import java.io.IOException;
@@ -33,16 +37,18 @@ public class TmuxService extends JVMService {
     protected volatile String sessionId;
 
     public TmuxService(
-        @NonNull TickLoop tickLoop,
+        @NonNull I18n i18n,
+        @NonNull DefaultTickLoop tickLoop,
         @NonNull Configuration nodeConfig,
         @NonNull ServiceConfiguration configuration,
-        @NonNull CloudServiceManager manager,
+        @NonNull InternalCloudServiceManager manager,
         @NonNull EventManager eventManager,
         @NonNull ServiceVersionProvider versionProvider,
         @NonNull ServiceConfigurationPreparer serviceConfigurationPreparer,
+        @NonNull ProcessServiceLogReadScheduler processLogReadScheduler,
         @NonNull TmuxConfiguration tmuxConfiguration
     ) {
-        super(tickLoop, nodeConfig, configuration, manager, eventManager, versionProvider, serviceConfigurationPreparer);
+        super(i18n, tickLoop, nodeConfig, configuration, manager, eventManager, versionProvider, serviceConfigurationPreparer, processLogReadScheduler);
         this.tmuxConfiguration = tmuxConfiguration;
     }
 
